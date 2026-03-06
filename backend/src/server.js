@@ -28,10 +28,27 @@ app.use("/api/tags", tagRoutes);
 app.use("/api/favorites", favoriteRoutes);
 app.use("/api/analytics", analyticsRoutes);
 
+// Health check endpoint (for monitoring and keep-alive)
+app.get("/health", (req, res) => {
+  res.status(200).json({ 
+    status: "OK", 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
 app.get("/", (req, res) => {
   res.send("API is running 🚀");
 });
 
-app.listen(process.env.PORT, () =>
-  console.log(`Server running on port ${process.env.PORT}`)
-);
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  
+  // Start keep-alive ping if in production
+  if (process.env.NODE_ENV === 'production' && process.env.RENDER_EXTERNAL_URL) {
+    const keepAlive = require('./utils/keepAlive');
+    keepAlive.start(process.env.RENDER_EXTERNAL_URL);
+  }
+});

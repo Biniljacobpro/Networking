@@ -13,6 +13,7 @@ const {
   approveEvent,
   rejectEvent,
   getPendingEvents,
+  getAllEventsForAdmin,
   generateQRCode,
 } = require("../controllers/eventController");
 
@@ -32,6 +33,7 @@ router.patch("/:id/archive", authenticate, authorizeRoles("ORGANIZER"), archiveE
 
 // Super Admin routes
 router.get("/admin/pending", authenticate, authorizeRoles("SUPER_ADMIN"), getPendingEvents);
+router.get("/admin/all", authenticate, authorizeRoles("SUPER_ADMIN"), getAllEventsForAdmin);
 router.patch("/:id/approve", authenticate, authorizeRoles("SUPER_ADMIN"), approveEvent);
 router.patch("/:id/reject", authenticate, authorizeRoles("SUPER_ADMIN"), rejectEvent);
 

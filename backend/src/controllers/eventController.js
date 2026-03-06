@@ -30,8 +30,15 @@ exports.createEvent = async (req, res) => {
       }
     }
 
+    // Automatically add organizer as participant with is_organizer = true
+    await pool.query(
+      `INSERT INTO event_participants (event_id, user_id, join_method, is_organizer)
+       VALUES ($1, $2, 'LINK', TRUE)`,
+      [event.id, organizerId]
+    );
+
     res.status(201).json({
-      message: "Event created and pending approval",
+      message: "Event created and pending approval. You are automatically added as an organizer.",
       event,
       qr_link: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/join/${slug}`,
       direct_link: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/join/${slug}`
@@ -266,6 +273,22 @@ exports.getPendingEvents = async (req, res) => {
        FROM events e
        LEFT JOIN users u ON e.organizer_id = u.id
        WHERE e.status='PENDING'
+       ORDER BY e.created_at DESC`
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Super Admin: Get All Events (all statuses)
+exports.getAllEventsForAdmin = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT e.*, u.name as organizer_name, u.email as organizer_email,
+       (SELECT COUNT(*) FROM event_participants WHERE event_id = e.id) as participant_count
+       FROM events e
+       LEFT JOIN users u ON e.organizer_id = u.id
        ORDER BY e.created_at DESC`
     );
     res.json(result.rows);

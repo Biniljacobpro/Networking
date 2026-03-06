@@ -37,6 +37,38 @@ exports.approveOrganizer = async (req, res) => {
   }
 };
 
+// Super Admin: Update User Role
+exports.updateUserRole = async (req, res) => {
+  const { userId } = req.params;
+  const { role } = req.body;
+
+  try {
+    // Validate role
+    const validRoles = ['SUPER_ADMIN', 'ORGANIZER', 'ORGANIZER_PENDING', 'PARTICIPANT'];
+    if (!role || !validRoles.includes(role)) {
+      return res.status(400).json({ 
+        message: "Invalid role. Must be one of: SUPER_ADMIN, ORGANIZER, ORGANIZER_PENDING, PARTICIPANT" 
+      });
+    }
+
+    const result = await pool.query(
+      `UPDATE users SET role=$1, updated_at=NOW() WHERE id=$2 RETURNING *`,
+      [role, userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ 
+      message: `User role updated to ${role} successfully`,
+      user: result.rows[0]
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 // Super Admin: Get Pending Organizer Requests
 exports.getPendingOrganizers = async (req, res) => {
   try {
@@ -114,6 +146,27 @@ exports.getMyJoinedEvents = async (req, res) => {
     );
 
     res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Get Public User Profile by ID
+exports.getPublicUserProfile = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const result = await pool.query(
+      `SELECT id, name, email, linkedin_url, company, designation, role
+       FROM users WHERE id = $1`,
+      [userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
