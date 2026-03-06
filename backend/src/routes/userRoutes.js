@@ -9,10 +9,13 @@ const {
   getUserProfile,
   updateUserProfile,
   getMyJoinedEvents,
+  updateUserRole,
+  getPublicUserProfile,
 } = require("../controllers/userController");
 
 // User profile routes
 router.get("/profile", authenticate, getUserProfile);
+router.get("/public/:userId", authenticate, getPublicUserProfile);
 router.put("/profile", authenticate, updateUserProfile);
 router.get("/joined-events", authenticate, getMyJoinedEvents);
 
@@ -22,5 +25,6 @@ router.post("/request-organizer", authenticate, requestOrganizer);
 // Super Admin routes
 router.get("/admin/pending-organizers", authenticate, authorizeRoles("SUPER_ADMIN"), getPendingOrganizers);
 router.patch("/admin/approve-organizer/:userId", authenticate, authorizeRoles("SUPER_ADMIN"), approveOrganizer);
+router.patch("/admin/update-role/:userId", authenticate, authorizeRoles("SUPER_ADMIN"), updateUserRole);
 
 module.exports = router;

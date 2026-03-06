@@ -89,6 +89,7 @@ CREATE TABLE event_participants (
     event_id UUID REFERENCES events(id) ON DELETE CASCADE,
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     join_method VARCHAR(10) CHECK (join_method IN ('QR', 'LINK')),
+    is_organizer BOOLEAN DEFAULT FALSE,
     joined_at TIMESTAMP DEFAULT NOW(),
     UNIQUE(event_id, user_id)
 );
@@ -97,6 +98,8 @@ CREATE TABLE event_participants (
 **Join Methods:**
 - `QR` - Joined by scanning QR code
 - `LINK` - Joined via direct link
+
+**is_organizer:** TRUE if this participant is the event organizer, FALSE otherwise
 
 ---
 

@@ -106,6 +106,24 @@ src/
 
 - [Database Schema](./DATABASE_SCHEMA.md) - Complete database structure
 - [API Documentation](./API_DOCUMENTATION.md) - All API endpoints
+- [Firebase Credentials Guide](./FIREBASE_CREDENTIALS_GUIDE.md) - How to extract and configure Firebase credentials
+- [Render Deployment Guide](./RENDER_DEPLOYMENT.md) - Step-by-step deployment to Render
+- [Quick Start Guide](./RENDER_QUICK_START.md) - Quick reference for deployment
+
+## 🚀 Deployment to Render
+
+This project is ready for deployment on Render with automatic keep-alive functionality to prevent cold starts.
+
+**Quick Start:**
+1. See [RENDER_QUICK_START.md](./RENDER_QUICK_START.md) for a quick reference
+2. Follow [RENDER_DEPLOYMENT.md](./RENDER_DEPLOYMENT.md) for detailed step-by-step instructions
+
+**Key Features:**
+- ✅ Automatic keep-alive ping (prevents cold starts)
+- ✅ PostgreSQL database included
+- ✅ Health check endpoint at `/health`
+- ✅ Environment variable configuration
+- ✅ One-click deployment from GitHub
 
 ## 🔐 Authentication
 

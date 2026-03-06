@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: event-networking-backend
+    env: node
+    region: oregon # Change to your preferred region (oregon, frankfurt, singapore, ohio)
+    plan: free # Change to 'starter' or other paid plans if needed
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: DATABASE_URL
+        sync: false # You'll add your Neon PostgreSQL connection string manually
+      - key: FIREBASE_PROJECT_ID
+        sync: false # Extract from serviceAccountKey.json
+      - key: FIREBASE_CLIENT_EMAIL
+        sync: false # Extract from serviceAccountKey.json
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false # Extract from serviceAccountKey.json (include quotes and \n)
+      - key: FRONTEND_URL
+        value: https://your-frontend-url.vercel.app

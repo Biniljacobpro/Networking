@@ -89,7 +89,7 @@ exports.getEventDirectory = async (req, res) => {
 
     let query = `
       SELECT DISTINCT u.id, u.name, u.email, u.linkedin_url, u.company, u.designation,
-             ep.joined_at, ep.join_method,
+             ep.joined_at, ep.join_method, ep.is_organizer,
              EXISTS(SELECT 1 FROM favorites WHERE event_id = $1 AND user_id = $2 AND favorited_user_id = u.id) as is_favorited,
              ARRAY_AGG(DISTINCT t.name) FILTER (WHERE t.name IS NOT NULL) as tags
       FROM event_participants ep
@@ -107,7 +107,7 @@ exports.getEventDirectory = async (req, res) => {
       params.push(`%${search}%`);
     }
 
-    query += ` GROUP BY u.id, u.name, u.email, u.linkedin_url, u.company, u.designation, ep.joined_at, ep.join_method`;
+    query += ` GROUP BY u.id, u.name, u.email, u.linkedin_url, u.company, u.designation, ep.joined_at, ep.join_method, ep.is_organizer`;
 
     // Add tag filter
     if (tags) {
@@ -145,7 +145,7 @@ exports.getParticipantProfile = async (req, res) => {
     // Get participant profile
     const result = await pool.query(
       `SELECT u.id, u.name, u.email, u.linkedin_url, u.company, u.designation,
-              ep.joined_at, ep.join_method,
+              ep.joined_at, ep.join_method, ep.is_organizer,
               EXISTS(SELECT 1 FROM favorites WHERE event_id = $1 AND user_id = $2 AND favorited_user_id = $3) as is_favorited,
               ARRAY_AGG(DISTINCT t.name) FILTER (WHERE t.name IS NOT NULL) as tags
        FROM users u
@@ -153,7 +153,7 @@ exports.getParticipantProfile = async (req, res) => {
        LEFT JOIN participant_tags pt ON pt.user_id = u.id AND pt.event_id = $1
        LEFT JOIN tags t ON pt.tag_id = t.id
        WHERE u.id = $3
-       GROUP BY u.id, u.name, u.email, u.linkedin_url, u.company, u.designation, ep.joined_at, ep.join_method`,
+       GROUP BY u.id, u.name, u.email, u.linkedin_url, u.company, u.designation, ep.joined_at, ep.join_method, ep.is_organizer`,
       [eventId, userId, participantId]
     );
 

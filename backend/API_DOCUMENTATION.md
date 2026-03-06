@@ -62,6 +62,22 @@ Authorization: Bearer <firebase_token>
 **Description:** Get all events user has joined  
 **Auth Required:** Yes
 
+### GET `/users/public/:userId`
+**Description:** Get public user profile by ID  
+**Auth Required:** Yes  
+**Response:**
+```json
+{
+  "id": "uuid",
+  "name": "John Doe",
+  "email": "user@example.com",
+  "role": "PARTICIPANT",
+  "linkedin_url": "https://linkedin.com/in/johndoe",
+  "company": "Tech Corp",
+  "designation": "Software Engineer"
+}
+```
+
 ### POST `/users/request-organizer`
 **Description:** Request organizer role  
 **Auth Required:** Yes  
@@ -76,6 +92,18 @@ Authorization: Bearer <firebase_token>
 **Description:** Approve organizer request  
 **Auth Required:** Yes  
 **Role:** SUPER_ADMIN
+
+### PATCH `/users/admin/update-role/:userId`
+**Description:** Update any user's role  
+**Auth Required:** Yes  
+**Role:** SUPER_ADMIN  
+**Body:**
+```json
+{
+  "role": "ORGANIZER"
+}
+```
+**Note:** Valid roles are: `SUPER_ADMIN`, `ORGANIZER`, `ORGANIZER_PENDING`, `PARTICIPANT`
 
 ---
 
@@ -95,6 +123,7 @@ Authorization: Bearer <firebase_token>
   "tags": ["Investor", "Startup Founder", "Developer"]
 }
 ```
+**Note:** The organizer is automatically added as a participant with `is_organizer = true` when an event is created.
 
 ### GET `/events/slug/:slug`
 **Description:** Get event details by slug (Public)  
@@ -141,6 +170,25 @@ Authorization: Bearer <firebase_token>
 **Auth Required:** Yes  
 **Role:** SUPER_ADMIN
 
+### GET `/events/admin/all`
+**Description:** Get all events (all statuses) for super admin  
+**Auth Required:** Yes  
+**Role:** SUPER_ADMIN  
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "name": "Event Name",
+    "status": "APPROVED",
+    "organizer_name": "John Doe",
+    "organizer_email": "john@example.com",
+    "participant_count": 150,
+    "created_at": "2026-03-01T10:00:00Z"
+  }
+]
+```
+
 ### PATCH `/events/:id/approve`
 **Description:** Approve event  
 **Auth Required:** Yes  
@@ -178,9 +226,45 @@ Authorization: Bearer <firebase_token>
 
 **Example:** `/participants/events/123/directory?search=john&tags=Developer,Investor`
 
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "name": "John Doe",
+    "email": "john@example.com",
+    "linkedin_url": "https://linkedin.com/in/johndoe",
+    "company": "Tech Corp",
+    "designation": "Software Engineer",
+    "is_organizer": false,
+    "is_favorited": true,
+    "tags": ["Developer", "Startup Founder"],
+    "joined_at": "2026-03-01T10:00:00Z",
+    "join_method": "QR"
+  }
+]
+```
+**Note:** `is_organizer` field indicates if the participant is the event organizer.
+
 ### GET `/participants/events/:eventId/participants/:participantId`
 **Description:** Get participant profile in event  
-**Auth Required:** Yes
+**Auth Required:** Yes  
+**Response:**
+```json
+{
+  "id": "uuid",
+  "name": "John Doe",
+  "email": "john@example.com",
+  "linkedin_url": "https://linkedin.com/in/johndoe",
+  "company": "Tech Corp",
+  "designation": "Software Engineer",
+  "is_organizer": false,
+  "is_favorited": false,
+  "tags": ["Developer"],
+  "joined_at": "2026-03-01T10:00:00Z",
+  "join_method": "QR"
+}
+```
 
 ### PUT `/participants/events/:eventId/my-tags`
 **Description:** Update my tags for an event  
